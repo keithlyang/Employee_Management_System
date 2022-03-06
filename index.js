@@ -5,9 +5,9 @@ require("dotenv").config();
 const db = mysql.createConnection(
     {
     host: "localhost",
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.database
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 },
 console.log(`Connected to the dundermifflin_db database.`)
 );
@@ -20,9 +20,7 @@ const options = () => {
             name: "choice",
             choices: [ "Add Departments", "View Departments", "Add Roles", "View Roles", "Add Employees", "View Employees", "Update an Employee", "Done"]
         }
-    ])
-
-.then(res => {
+    ]).then(res => {
     switch (res.choice) {
         case "Add Departments":
             addDepartments();
@@ -44,6 +42,9 @@ const options = () => {
             break;
         case "Update an Employee":
             updateEmployee();
+            break;
+        case "Done":
+            db.end();
             break;
         default:
             options();
@@ -80,7 +81,7 @@ function viewEmployees() {
        return;
     }
     console.table(res);
-    listofOptions();
+    options();
   });
 }
 function addDepartments() {
@@ -96,9 +97,10 @@ function addDepartments() {
       db.query(sql, answer.newDepartment, function (err, res) {
         if (err) throw err;
         console.log(`Successfully Added Department!`);
-        listofOptions();
+        options();
       });
-    });
+    }
+    );
 }
 function addRoles() {
     inquirer.prompt([
@@ -125,10 +127,10 @@ function addRoles() {
       db.query(sql,[answer.title, answer.salary, answer.departmentID],function (err, res) {
           if (err) throw err;
             console.log(`Successfully Added Role: ${answer.title}`);
-            listofOptions();
+            options();
           }
-      )}
-    )
+      )
+    })
 }
 function addEmployees() {
     inquirer.prompt([
@@ -158,14 +160,14 @@ function addEmployees() {
       db.query(sql,[answer.employeefirstName, answer.employeelastName, answer.employeeroleID, answer.managerID],function (err, res) {
           if (err) throw err;
             console.log(`Successfully Added Role: ${answer.employeefirstName}`);
-            listofOptions();
+            options();
           }
-      )}
-    )
+      )
+    })
 }
 function updateEmployee() {
     console.log('Update an Employee');
-    listofOptions();
+    options();
 }
 
 options();
